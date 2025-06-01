@@ -1,57 +1,29 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import LocalVideo from '../LocalVideo/LocalVideo';
+import AiStreamingAvatar from '../AiStreamingAvatar/AiStreamingAvatar';
 
-const VideoCall: React.FC = () => {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [error, setError] = useState<string | null>(null);
+interface VideoCallProps {}
 
-  const startStream = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      });
-      console.log(stream.getVideoTracks());
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-    } catch (err: any) {
-      console.error('Erro ao acessar câmera/mic:', err);
-      setError(err.message || 'Erro desconhecido');
-    }
-  };
-
-  useEffect(() => {
-    startStream();
-  }, []);
-
-  useEffect(() => {
-    if (videoRef.current?.srcObject) {
-      const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
-      tracks.forEach((track) => track.stop());
-    }
-  }, [videoRef]);
+const VideoCall: React.FC<VideoCallProps> = () => {
+  const { uuid } = useParams();
 
   return (
-    <div>
-      <h2>Chamada de Vídeo</h2>
-      {/* {error ? (
-      ) : ( */}
-      <p style={{ color: 'red' }}>Erro: {error}</p>
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          muted
-          style={{
-            width: '640px',
-            height: '480px',
-            border: '1px solid black',
-            backgroundColor: 'black',
-          }}
-        />
-      {/* )} */}
+    <div className="flex flex-col h-screen">
+      <header className="p-4 bg-gray-800 text-white text-center">
+        Chamada - Sessão: {uuid}
+      </header>
+
+      <div className="flex flex-1">
+        <div className="flex-1 flex justify-center items-center bg-black">
+          <LocalVideo />
+        </div>
+
+        <div className="flex-1 flex justify-center items-center bg-gray-200">
+          <AiStreamingAvatar />
+        </div>
+      </div>
     </div>
   );
-};
+}
 
 export default VideoCall;
